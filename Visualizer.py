@@ -36,16 +36,15 @@ class DrawingLogistics:
         self.max_val = max(arr)
 
         self.block_width = round((self.width - self.SIDE_PAD) / len(arr))
-        self.block_height = {
-            round((self.height - self.TOP_PAD) /
-                  (self.max_val - self.min_val))
-        }
+        self.block_height = round(
+            (self.height - self.TOP_PAD) / (self.max_val - self.min_val))
 
         self.start_x = self.SIDE_PAD // 2
 
 
 def draw(draw_info):
     draw_info.window.fill(draw_info.BACKGROUND)
+    draw_arr(draw_info)
     pygame.display.update()
 
 
@@ -53,8 +52,11 @@ def draw_arr(draw_info):
     arr = draw_info.arr
     for i, val in enumerate(arr):
         x = draw_info.start_x + i * draw_info.block_width
-        y = draw_info.height - ((val - draw_info.min_val)
-                                * draw_info.block_height)
+        y = (draw_info.height - (val - draw_info.min_val) *
+             draw_info.block_height)
+        color = draw_info.GRADIENTS[i % 3]
+        pygame.draw.rect(draw_info.window, color,
+                         (x, y, draw_info.block_width, draw_info.height))
 
 
 def generate_list(n, min_val, max_val):
@@ -79,9 +81,15 @@ def main():
 
     while run:
         clock.tick(60)
+        draw(draw_info)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            if event.type != pygame.KEYDOWN:
+                continue
+            if event.key == pygame.K_r:
+                new_arr = generate_list(n, min_val, max_val)
+                draw_info.set_list(new_arr)
     pygame.quit()
 
 
